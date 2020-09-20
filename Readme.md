@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Арам Бадалян](https://up.htmlacademy.ru/javascript/21/user/1486639).
-* Наставник: `Неизвестно`.
+* Наставник: [Артем Доба](https://htmlacademy.ru/profile/id618431).
 
 ---
 
