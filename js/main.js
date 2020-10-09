@@ -35,18 +35,24 @@ const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
 const OFFSET_X = PIN_WIDTH / 2;
 const OFFSET_Y = PIN_HEIGHT;
-const MAP_WIDTH = document.querySelector(`.map`).clientWidth;
+const MAP = document.querySelector(`.map`);
+const LOC_X_MIN = 0 + OFFSET_X;
+const LOC_X_MAX = MAP.clientWidth - OFFSET_X;
 const LOC_Y_MIN = 130;
 const LOC_Y_MAX = 630;
 
 const MAP_PINS = document.querySelector(`.map__pins`);
-const PIN_TEMPLATE = document.querySelector(`#pin`)
-  .content
-  .querySelector(`.map__pin`);
+const PIN_TEMPLATE = document.querySelector(`#pin`);
 
 // Функции
 const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
+};
+
+const getRandomIntInclusive = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; // Максимум и минимум включаются
 };
 
 const getRandomDescription = (possibleOptions) => {
@@ -57,13 +63,13 @@ const getRandomDescription = (possibleOptions) => {
   for (let i = 0, l = getRandomInt(possibleOptions.length); i < l; i++) {
     // Удаляем опции из копии массива, чтобы не повторяться
     // В результат записываем нулевой(единственный) элемент вырезанного массива
-    result[i] = mutableOptions.splice(getRandomInt(mutableOptions.length), 1)[0];
+    result.push(mutableOptions.splice(getRandomInt(mutableOptions.length), 1)[0]);
   }
 
   return result;
 };
 
-const getSimilarOffers = (offersNumber) => {
+/* const getSimilarOffers = (offersNumber) => {
   const similarOffers = [];
   let avatarFiles = [];
 
@@ -74,14 +80,14 @@ const getSimilarOffers = (offersNumber) => {
 
   for (let i = 0; i < offersNumber; i++) {
     // Определяем координаты кончика указателя вычитанием смещения
-    let locationX = getRandomInt(MAP_WIDTH) - OFFSET_X;
+    let locationX = getRandomArbitrary(LOC_X_MIN, LOC_X_MAX);
     // Ограничение по Y от LOC_Y_MIN до LOC_Y_MAX
-    let locationY = getRandomInt(LOC_Y_MAX - LOC_Y_MIN) + LOC_Y_MIN - OFFSET_Y;
+    let locationY = getRandomArbitrary(LOC_Y_MIN, LOC_Y_MAX);
 
     similarOffers[i] = {
       author: {
         // При присвоении значения удаляем файл из массива, чтобы не использовать повторно
-        avatar: `${AVATAR_PATH}${avatarFiles.splice(getRandomInt(avatarFiles.length), 1)[0]}`
+        avatar: `${AVATAR_PATH}${avatarFiles[i]}`
       },
       location: {
         x: locationX,
@@ -104,13 +110,56 @@ const getSimilarOffers = (offersNumber) => {
   }
 
   return similarOffers;
+}; */
+
+const getRandomOffer = () => {
+  // Определяем координаты кончика указателя вычитанием смещения
+  let locationX = getRandomIntInclusive(LOC_X_MIN, LOC_X_MAX);
+  // Ограничение по Y от LOC_Y_MIN до LOC_Y_MAX
+  let locationY = getRandomIntInclusive(LOC_Y_MIN, LOC_Y_MAX);
+
+  const offer = {
+    location: {
+      x: locationX,
+      y: locationY
+    },
+    offer: {
+      title: `Заголовок предложения`,
+      address: `${locationX}, ${locationY}`,
+      price: getRandomInt(20) * 1000,
+      type: OFFER_TYPE[getRandomInt(OFFER_TYPE.length)],
+      rooms: getRandomInt(10),
+      guests: getRandomInt(12),
+      checkin: OFFER_CHECKIN[getRandomInt(OFFER_CHECKIN.length)],
+      checkout: OFFER_CHECKOUT[getRandomInt(OFFER_CHECKOUT.length)],
+      features: getRandomDescription(OFFER_FEATURES),
+      description: `Описание`,
+      photos: getRandomDescription(OFFER_PHOTOS)
+    }
+  };
+  return offer;
+};
+
+const getRandomOffersList = (offersNumber) => {
+  const similarOffers = [];
+  let avatarFiles = [];
+
+  // Генерируем названия файлов аватаров и массив предложений
+  for (let i = 0; i < offersNumber; i++) {
+    avatarFiles[i] = `user0${i + 1}.png`;
+    similarOffers[i] = getRandomOffer();
+    similarOffers[i].author = {avatar: `${AVATAR_PATH}${avatarFiles[i]}`};
+  }
+
+  return similarOffers;
 };
 
 const renderPin = (pin) => {
-  const pinElement = PIN_TEMPLATE.cloneNode(true);
+  const pinElement = PIN_TEMPLATE.content.cloneNode(true);
+  const pinElementButton = pinElement.querySelector(`.map__pin`);
   const pinElementImage = pinElement.querySelector(`img`);
 
-  pinElement.style = `left: ${pin.location.x}px; top: ${pin.location.y}px`;
+  pinElementButton.style = `left: ${pin.location.x - OFFSET_X}px; top: ${pin.location.y - OFFSET_Y}px`;
   pinElementImage.src = pin.author.avatar;
   pinElementImage.alt = pin.offer.title;
 
@@ -127,7 +176,8 @@ const fillElement = (items) => {
   return fragment;
 };
 
-const nearbyOffers = getSimilarOffers(OFFERS_NUMBER);
+const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
 const mapPins = fillElement(nearbyOffers);
 
+MAP.classList.remove(`map--faded`);
 MAP_PINS.appendChild(mapPins);
