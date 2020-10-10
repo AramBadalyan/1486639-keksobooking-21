@@ -1,11 +1,32 @@
 'use strict';
 
 const OFFERS_NUMBER = 8;
+const OFFER_PRICE = [
+  1000,
+  2000,
+  4000,
+  8000,
+  16000
+];
 const OFFER_TYPE = [
   `palace`,
   `flat`,
   `house`,
   `bungalow`
+];
+const OFFER_ROOMS = [
+  1,
+  2,
+  3,
+  4,
+  5
+];
+const OFFER_GUESTS = [
+  1,
+  2,
+  3,
+  4,
+  8
 ];
 const OFFER_CHECKIN = [
   `12:00`,
@@ -49,9 +70,9 @@ const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 };
 
-const getRandomIntInclusive = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
+const getRandomIntInclusive = (minValue, maxValue) => {
+  const min = Math.ceil(minValue);
+  const max = Math.floor(maxValue);
   return Math.floor(Math.random() * (max - min + 1)) + min; // Максимум и минимум включаются
 };
 
@@ -69,56 +90,16 @@ const getRandomDescription = (possibleOptions) => {
   return result;
 };
 
-/* const getSimilarOffers = (offersNumber) => {
-  const similarOffers = [];
-  let avatarFiles = [];
-
-  // Генерируем названия файлов аватаров
-  for (let i = 0; i < offersNumber; i++) {
-    avatarFiles[i] = `user0${i + 1}.png`;
-  }
-
-  for (let i = 0; i < offersNumber; i++) {
-    // Определяем координаты кончика указателя вычитанием смещения
-    let locationX = getRandomArbitrary(LOC_X_MIN, LOC_X_MAX);
-    // Ограничение по Y от LOC_Y_MIN до LOC_Y_MAX
-    let locationY = getRandomArbitrary(LOC_Y_MIN, LOC_Y_MAX);
-
-    similarOffers[i] = {
-      author: {
-        // При присвоении значения удаляем файл из массива, чтобы не использовать повторно
-        avatar: `${AVATAR_PATH}${avatarFiles[i]}`
-      },
-      location: {
-        x: locationX,
-        y: locationY
-      },
-      offer: {
-        title: `Заголовок предложения`,
-        address: `${locationX}, ${locationY}`,
-        price: getRandomInt(20) * 1000,
-        type: OFFER_TYPE[getRandomInt(OFFER_TYPE.length)],
-        rooms: getRandomInt(10),
-        guests: getRandomInt(12),
-        checkin: OFFER_CHECKIN[getRandomInt(OFFER_CHECKIN.length)],
-        checkout: OFFER_CHECKOUT[getRandomInt(OFFER_CHECKOUT.length)],
-        features: getRandomDescription(OFFER_FEATURES),
-        description: `Описание`,
-        photos: getRandomDescription(OFFER_PHOTOS)
-      }
-    };
-  }
-
-  return similarOffers;
-}; */
-
-const getRandomOffer = () => {
+const getRandomOffer = (number) => {
   // Определяем координаты кончика указателя вычитанием смещения
   let locationX = getRandomIntInclusive(LOC_X_MIN, LOC_X_MAX);
   // Ограничение по Y от LOC_Y_MIN до LOC_Y_MAX
   let locationY = getRandomIntInclusive(LOC_Y_MIN, LOC_Y_MAX);
 
   const offer = {
+    author: {
+      avatar: `${AVATAR_PATH}user0${number}.png`
+    },
     location: {
       x: locationX,
       y: locationY
@@ -126,10 +107,10 @@ const getRandomOffer = () => {
     offer: {
       title: `Заголовок предложения`,
       address: `${locationX}, ${locationY}`,
-      price: getRandomInt(20) * 1000,
+      price: OFFER_PRICE[getRandomInt(OFFER_PRICE.length)],
       type: OFFER_TYPE[getRandomInt(OFFER_TYPE.length)],
-      rooms: getRandomInt(10),
-      guests: getRandomInt(12),
+      rooms: OFFER_ROOMS[getRandomInt(OFFER_ROOMS.length)],
+      guests: OFFER_GUESTS[getRandomInt(OFFER_GUESTS.length)],
       checkin: OFFER_CHECKIN[getRandomInt(OFFER_CHECKIN.length)],
       checkout: OFFER_CHECKOUT[getRandomInt(OFFER_CHECKOUT.length)],
       features: getRandomDescription(OFFER_FEATURES),
@@ -142,13 +123,10 @@ const getRandomOffer = () => {
 
 const getRandomOffersList = (offersNumber) => {
   const similarOffers = [];
-  let avatarFiles = [];
 
-  // Генерируем названия файлов аватаров и массив предложений
+  // Генерируем массив предложений
   for (let i = 0; i < offersNumber; i++) {
-    avatarFiles[i] = `user0${i + 1}.png`;
-    similarOffers[i] = getRandomOffer();
-    similarOffers[i].author = {avatar: `${AVATAR_PATH}${avatarFiles[i]}`};
+    similarOffers.push(getRandomOffer(i + 1));
   }
 
   return similarOffers;
