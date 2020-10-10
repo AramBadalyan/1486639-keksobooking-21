@@ -177,11 +177,14 @@ const renderCard = (offerObj) => {
   cardElementFeaturesList.innerHTML = ``;
   cardElementPhotosList.innerHTML = ``;
 
+  const cardElementFeatures = document.createDocumentFragment();
+  const cardElementPhotos = document.createDocumentFragment();
+
   for (let i = 0; i < offerObj.offer.features.length; i++) {
     let newFeature = document.createElement(`li`);
     newFeature.classList.add(`popup__feature`, `popup__feature--${offerObj.offer.features[i]}`);
 
-    cardElementFeaturesList.appendChild(newFeature);
+    cardElementFeatures.appendChild(newFeature);
   }
 
   for (let i = 0; i < offerObj.offer.photos.length; i++) {
@@ -192,8 +195,11 @@ const renderCard = (offerObj) => {
     newPhoto.alt = `Фотография жилья`;
     newPhoto.src = offerObj.offer.photos[i];
 
-    cardElementPhotosList.appendChild(newPhoto);
+    cardElementPhotos.appendChild(newPhoto);
   }
+
+  cardElementFeaturesList.appendChild(cardElementFeatures);
+  cardElementPhotosList.appendChild(cardElementPhotos);
 
   return cardElement;
 };
