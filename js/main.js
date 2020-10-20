@@ -51,12 +51,12 @@ const OFFER_PHOTOS = [
   `http://o0.github.io/assets/images/tokyo/hotel2.jpg`,
   `http://o0.github.io/assets/images/tokyo/hotel3.jpg`
 ];
-const HABITATION_TYPE = {
+/* const HABITATION_TYPE = {
   palace: `Дворец`,
   flat: `Квартира`,
   house: `Дом`,
   bungalow: `Бунгало`
-};
+}; */
 const AVATAR_PATH = `img/avatars/`;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
@@ -70,7 +70,31 @@ const LOC_Y_MAX = 630;
 
 const MAP_PINS = document.querySelector(`.map__pins`);
 const PIN_TEMPLATE = document.querySelector(`#pin`);
-const CARD_TEMPLATE = document.querySelector(`#card`);
+/* const CARD_TEMPLATE = document.querySelector(`#card`); */
+const MOUSE_MAIN_BTN = 0;
+const ETR_KEY = `Enter`;
+const POINTER_HEIGHT = 22; // 22px - высота кончика указателя
+
+// Форма нового объявления и фильтрации
+const filterForm = MAP.querySelector(`.map__filters`);
+const filterFormElements = filterForm.children;
+const adForm = document.querySelector(`.ad-form`);
+const adFormElements = adForm.children;
+const addressInput = adForm.querySelector(`#address`);
+const roomsInput = adForm.querySelector(`#room_number`);
+const capacityInput = adForm.querySelector(`#capacity`);
+
+const mainPin = MAP.querySelector(`.map__pin--main`);
+const mainPinWidth = mainPin.clientWidth;
+const mainPinHeight = mainPin.clientHeight;
+const mainPinAddress = {
+  x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
+  y: Math.round(mainPin.offsetTop + mainPinHeight + POINTER_HEIGHT)
+};
+const mainPinStartPosition = {
+  x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
+  y: Math.round(mainPin.offsetTop + mainPinHeight / 2)
+};
 
 // Функции
 const getRandomInt = (max) => {
@@ -151,7 +175,7 @@ const renderPin = (pin) => {
   return pinElement;
 };
 
-const renderCard = (offerObj) => {
+/* const renderCard = (offerObj) => {
   const cardElement = CARD_TEMPLATE.content.cloneNode(true);
   const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
   const cardElementTitle = cardElement.querySelector(`.popup__title`);
@@ -202,7 +226,7 @@ const renderCard = (offerObj) => {
   cardElementPhotosList.appendChild(cardElementPhotos);
 
   return cardElement;
-};
+}; */
 
 const fillElement = (items) => {
   const fragment = document.createDocumentFragment();
@@ -214,9 +238,97 @@ const fillElement = (items) => {
   return fragment;
 };
 
-const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
-const mapPins = fillElement(nearbyOffers);
+// Перевод страницы в неактивное состояние
+const disactivatePage = () => {
+  MAP.classList.add(`map--faded`);
+  adForm.classList.add(`ad-form--disabled`);
+  for (let element of adFormElements) {
+    element.disabled = true;
+  }
+  for (let element of filterFormElements) {
+    element.disabled = true;
+  }
+};
 
+// Активация страницы
+const activatePage = () => {
+  const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
+  const mapPins = fillElement(nearbyOffers);
+
+  MAP.classList.remove(`map--faded`);
+  adForm.classList.remove(`ad-form--disabled`);
+  for (let element of adFormElements) {
+    element.disabled = false;
+  }
+  for (let element of filterFormElements) {
+    element.disabled = false;
+  }
+  MAP_PINS.appendChild(mapPins);
+};
+
+// Заполнение поля Адрес
+const setAddresInputValue = () => {
+  addressInput.value = `${mainPinAddress.x}, ${mainPinAddress.y}`;
+};
+
+// Валидация поля Количество мест
+const validateGuestsNumber = () => {
+  if (capacityInput.value === `0` && roomsInput.value !== `100`) {
+    capacityInput.setCustomValidity(
+        `Опция "
+        ${capacityInput.querySelector(`option[value="0"]`).textContent}
+        " доступна только с пунктом "
+        ${roomsInput.querySelector(`option[value="100"]`).textContent}
+        "`
+    );
+  } else if (roomsInput.value === `100` && capacityInput.value !== `0`) {
+    capacityInput.setCustomValidity(
+        `Для опции "
+        ${roomsInput.querySelector(`option[value="100"]`).textContent}
+        " доступен только пункт "
+        ${capacityInput.querySelector(`option[value="0"]`).textContent}
+        "`
+    );
+  } else if (parseInt(capacityInput.value, 10) > parseInt(roomsInput.value, 10)) {
+    capacityInput.setCustomValidity(`Количество мест не может превышать количество комнат`);
+  } else {
+    capacityInput.setCustomValidity(``);
+  }
+
+  capacityInput.reportValidity();
+};
+
+/* const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
+const mapPins = fillElement(nearbyOffers);
 MAP.classList.remove(`map--faded`);
 MAP_PINS.appendChild(mapPins);
-MAP.insertBefore(renderCard(nearbyOffers[0]), MAP.querySelector(`.map__filters-container`));
+MAP.insertBefore(renderCard(nearbyOffers[0]), MAP.querySelector(`.map__filters-container`)); */
+
+adForm.action = `https://21.javascript.pages.academy/keksobooking`;
+addressInput.value = `${mainPinStartPosition.x}, ${mainPinStartPosition.y}`;
+disactivatePage();
+
+mainPin.addEventListener(`mousedown`, function (evt) {
+  evt.preventDefault();
+  if (evt.button === MOUSE_MAIN_BTN) {
+    activatePage();
+    setAddresInputValue();
+  }
+});
+
+mainPin.addEventListener(`keydown`, function (evt) {
+  evt.preventDefault();
+  if (evt.key === ETR_KEY) {
+    activatePage();
+    setAddresInputValue();
+  }
+});
+
+capacityInput.addEventListener(`change`, function () {
+  validateGuestsNumber();
+});
+
+roomsInput.addEventListener(`change`, function () {
+  validateGuestsNumber();
+});
+
