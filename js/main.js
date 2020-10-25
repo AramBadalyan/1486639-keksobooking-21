@@ -51,12 +51,12 @@ const OFFER_PHOTOS = [
   `http://o0.github.io/assets/images/tokyo/hotel2.jpg`,
   `http://o0.github.io/assets/images/tokyo/hotel3.jpg`
 ];
-const HABITATION_TYPE = {
+/* const HABITATION_TYPE = {
   palace: `Дворец`,
   flat: `Квартира`,
   house: `Дом`,
   bungalow: `Бунгало`
-};
+}; */
 const AVATAR_PATH = `img/avatars/`;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
@@ -70,7 +70,59 @@ const LOC_Y_MAX = 630;
 
 const MAP_PINS = document.querySelector(`.map__pins`);
 const PIN_TEMPLATE = document.querySelector(`#pin`);
-const CARD_TEMPLATE = document.querySelector(`#card`);
+/* const CARD_TEMPLATE = document.querySelector(`#card`); */
+/* const MOUSE_MAIN_BTN = 0; */
+/* const ETR_KEY = `Enter`; */
+const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
+
+// Форма нового объявления и фильтрации
+const MIN_TITLE_LENGTH = 30;
+const MAX_TITLE_LENGTH = 100;
+
+const filterForm = MAP.querySelector(`.map__filters`);
+const filterFormElements = filterForm.children;
+const adForm = document.querySelector(`.ad-form`);
+const adFormElements = adForm.children;
+const addressInput = adForm.querySelector(`#address`);
+const roomsInput = adForm.querySelector(`#room_number`);
+const capacityInput = adForm.querySelector(`#capacity`);
+const adFormReset = adForm.querySelector(`.ad-form__reset`);
+const titleInput = adForm.querySelector(`#title`);
+const typeInput = adForm.querySelector(`#type`);
+const priceInput = adForm.querySelector(`#price`);
+
+const guestCapacity = {
+  '1': [`1`],
+  '2': [`1`, `2`],
+  '3': [`1`, `2`, `3`],
+  '100': [`0`]
+};
+const guestValidation = {
+  '1': `Только на одного гостя`,
+  '2': `Только на одного или двух гостей`,
+  '3': `Только на одного, двух или трех гостей`,
+  '100': `Только не для гостей`
+};
+const priceOfType = {
+  'bungalow': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+let typeOfRoom = `1`;
+let typeOfHouse = `flat`;
+
+const mainPin = MAP.querySelector(`.map__pin--main`);
+const mainPinWidth = mainPin.clientWidth;
+const mainPinHeight = mainPin.clientHeight;
+const mainPinAddress = {
+  x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
+  y: Math.round(mainPin.offsetTop + mainPinHeight + POINTER_HEIGHT)
+};
+const mainPinStartPosition = {
+  x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
+  y: Math.round(mainPin.offsetTop + mainPinHeight / 2)
+};
 
 // Функции
 const getRandomInt = (max) => {
@@ -151,7 +203,14 @@ const renderPin = (pin) => {
   return pinElement;
 };
 
-const renderCard = (offerObj) => {
+const removePins = () => {
+  const pins = MAP.querySelectorAll(`.map__pin:not(.map__pin--main)`);
+  pins.forEach(function (pin) {
+    pin.remove();
+  });
+};
+
+/* const renderCard = (offerObj) => {
   const cardElement = CARD_TEMPLATE.content.cloneNode(true);
   const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
   const cardElementTitle = cardElement.querySelector(`.popup__title`);
@@ -202,7 +261,7 @@ const renderCard = (offerObj) => {
   cardElementPhotosList.appendChild(cardElementPhotos);
 
   return cardElement;
-};
+}; */
 
 const fillElement = (items) => {
   const fragment = document.createDocumentFragment();
@@ -214,9 +273,132 @@ const fillElement = (items) => {
   return fragment;
 };
 
-const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
-const mapPins = fillElement(nearbyOffers);
+// Перевод страницы в неактивное состояние
+const disactivatePage = () => {
+  MAP.classList.add(`map--faded`);
+  adForm.classList.add(`ad-form--disabled`);
+  for (let element of adFormElements) {
+    element.disabled = true;
+  }
+  for (let element of filterFormElements) {
+    element.disabled = true;
+  }
+  removePins();
+};
 
+// Активация страницы
+const activatePage = () => {
+  const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
+  const mapPins = fillElement(nearbyOffers);
+
+  MAP.classList.remove(`map--faded`);
+  adForm.classList.remove(`ad-form--disabled`);
+  for (let element of adFormElements) {
+    element.disabled = false;
+  }
+  for (let element of filterFormElements) {
+    element.disabled = false;
+  }
+  MAP_PINS.appendChild(mapPins);
+};
+
+// Заполнение поля Адрес
+const setAddresInputValue = () => {
+  addressInput.value = `${mainPinAddress.x}, ${mainPinAddress.y}`;
+};
+
+// Валидация поля Количество мест
+const typeOfCapacity = (target) => {
+  const value = target.value;
+  const isValid = guestCapacity[typeOfRoom].some(function (element) {
+    return element === value;
+  });
+  if (!isValid) {
+    target.setCustomValidity(guestValidation[typeOfRoom]);
+  } else {
+    target.setCustomValidity(``);
+  }
+
+  target.reportValidity();
+};
+
+// Валидация Типа жилья и Цены за ночь
+const priceValidation = function (target) {
+  const value = target.value;
+  if (target.validity.valueMissing) {
+    target.setCustomValidity(`Обязательное поле`);
+  } else if (value < priceOfType[typeOfHouse]) {
+    target.setCustomValidity(`Минимальная цена ${priceOfType[typeOfHouse]}`);
+  } else if (value > 1000000) {
+    target.setCustomValidity(`Максимальная цена 1000000`);
+  } else {
+    target.setCustomValidity(``);
+  }
+  target.reportValidity();
+};
+
+// Валидация длины введенного значения
+const valueLengthValidation = (target, minValue, maxValue) => {
+  let valueLength = target.value.length;
+  if (valueLength < minValue) {
+    target.setCustomValidity(`Ещё хотя бы ${minValue - valueLength} знака(ов)`);
+  } else if (valueLength > maxValue) {
+    target.setCustomValidity(`Слишком длинно. Удалите лишние ${valueLength - maxValue} знака(ов)`);
+  } else {
+    target.setCustomValidity(``);
+  }
+
+  target.reportValidity();
+};
+
+/* const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
+const mapPins = fillElement(nearbyOffers);
 MAP.classList.remove(`map--faded`);
 MAP_PINS.appendChild(mapPins);
-MAP.insertBefore(renderCard(nearbyOffers[0]), MAP.querySelector(`.map__filters-container`));
+MAP.insertBefore(renderCard(nearbyOffers[0]), MAP.querySelector(`.map__filters-container`)); */
+
+adForm.action = `https://21.javascript.pages.academy/keksobooking`;
+addressInput.value = `${mainPinStartPosition.x}, ${mainPinStartPosition.y}`;
+disactivatePage();
+
+mainPin.addEventListener(`click`, function (evt) {
+  evt.preventDefault();
+  activatePage();
+  setAddresInputValue();
+});
+
+roomsInput.addEventListener(`change`, function (evt) {
+  typeOfRoom = evt.target.value;
+  typeOfCapacity(capacityInput);
+});
+
+capacityInput.addEventListener(`change`, function (evt) {
+  typeOfCapacity(evt.target);
+});
+
+// У кнопки "очистить" type="reset", дополнительно сбрасывать форму не нужно
+adFormReset.addEventListener(`click`, function () {
+  disactivatePage();
+});
+
+titleInput.required = true;
+titleInput.minLength = MIN_TITLE_LENGTH;
+titleInput.maxLength = MAX_TITLE_LENGTH;
+
+titleInput.addEventListener(`input`, function (evt) {
+  valueLengthValidation(evt.target, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH);
+});
+
+priceInput.required = true;
+priceInput.max = 1000000;
+priceInput.placeholder = priceOfType[typeOfHouse];
+
+priceInput.addEventListener(`input`, function (evt) {
+  priceValidation(evt.target);
+});
+
+typeInput.addEventListener(`change`, function () {
+  typeOfHouse = typeInput.value;
+  priceInput.placeholder = priceOfType[typeOfHouse];
+  priceValidation(priceInput);
+});
