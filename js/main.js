@@ -71,11 +71,14 @@ const LOC_Y_MAX = 630;
 const MAP_PINS = document.querySelector(`.map__pins`);
 const PIN_TEMPLATE = document.querySelector(`#pin`);
 /* const CARD_TEMPLATE = document.querySelector(`#card`); */
-const MOUSE_MAIN_BTN = 0;
-const ETR_KEY = `Enter`;
-const POINTER_HEIGHT = 22; // 22px - высота кончика указателя
+/* const MOUSE_MAIN_BTN = 0; */
+/* const ETR_KEY = `Enter`; */
+const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
 
 // Форма нового объявления и фильтрации
+const MIN_TITLE_LENGTH = 30;
+const MAX_TITLE_LENGTH = 100;
+
 const filterForm = MAP.querySelector(`.map__filters`);
 const filterFormElements = filterForm.children;
 const adForm = document.querySelector(`.ad-form`);
@@ -83,6 +86,31 @@ const adFormElements = adForm.children;
 const addressInput = adForm.querySelector(`#address`);
 const roomsInput = adForm.querySelector(`#room_number`);
 const capacityInput = adForm.querySelector(`#capacity`);
+const adFormReset = adForm.querySelector(`.ad-form__reset`);
+const titleInput = adForm.querySelector(`#title`);
+const typeInput = adForm.querySelector(`#type`);
+const priceInput = adForm.querySelector(`#price`);
+
+const guestCapacity = {
+  '1': [`1`],
+  '2': [`1`, `2`],
+  '3': [`1`, `2`, `3`],
+  '100': [`0`]
+};
+const guestValidation = {
+  '1': `Только на одного гостя`,
+  '2': `Только на одного или двух гостей`,
+  '3': `Только на одного, двух или трех гостей`,
+  '100': `Только не для гостей`
+};
+const priceOfType = {
+  'bungalow': 0,
+  'flat': 1000,
+  'house': 5000,
+  'palace': 10000
+};
+let typeOfRoom = `1`;
+let typeOfHouse = `flat`;
 
 const mainPin = MAP.querySelector(`.map__pin--main`);
 const mainPinWidth = mainPin.clientWidth;
@@ -175,6 +203,13 @@ const renderPin = (pin) => {
   return pinElement;
 };
 
+const removePins = () => {
+  const pins = MAP.querySelectorAll(`.map__pin:not(.map__pin--main)`);
+  pins.forEach(function (pin) {
+    pin.remove();
+  });
+};
+
 /* const renderCard = (offerObj) => {
   const cardElement = CARD_TEMPLATE.content.cloneNode(true);
   const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
@@ -248,6 +283,7 @@ const disactivatePage = () => {
   for (let element of filterFormElements) {
     element.disabled = true;
   }
+  removePins();
 };
 
 // Активация страницы
@@ -272,30 +308,47 @@ const setAddresInputValue = () => {
 };
 
 // Валидация поля Количество мест
-const validateGuestsNumber = () => {
-  if (capacityInput.value === `0` && roomsInput.value !== `100`) {
-    capacityInput.setCustomValidity(
-        `Опция "
-        ${capacityInput.querySelector(`option[value="0"]`).textContent}
-        " доступна только с пунктом "
-        ${roomsInput.querySelector(`option[value="100"]`).textContent}
-        "`
-    );
-  } else if (roomsInput.value === `100` && capacityInput.value !== `0`) {
-    capacityInput.setCustomValidity(
-        `Для опции "
-        ${roomsInput.querySelector(`option[value="100"]`).textContent}
-        " доступен только пункт "
-        ${capacityInput.querySelector(`option[value="0"]`).textContent}
-        "`
-    );
-  } else if (parseInt(capacityInput.value, 10) > parseInt(roomsInput.value, 10)) {
-    capacityInput.setCustomValidity(`Количество мест не может превышать количество комнат`);
+const typeOfCapacity = (target) => {
+  const value = target.value;
+  const isValid = guestCapacity[typeOfRoom].some(function (element) {
+    return element === value;
+  });
+  if (!isValid) {
+    target.setCustomValidity(guestValidation[typeOfRoom]);
   } else {
-    capacityInput.setCustomValidity(``);
+    target.setCustomValidity(``);
   }
 
-  capacityInput.reportValidity();
+  target.reportValidity();
+};
+
+// Валидация Типа жилья и Цены за ночь
+const priceValidation = function (target) {
+  const value = target.value;
+  if (target.validity.valueMissing) {
+    target.setCustomValidity(`Обязательное поле`);
+  } else if (value < priceOfType[typeOfHouse]) {
+    target.setCustomValidity(`Минимальная цена ${priceOfType[typeOfHouse]}`);
+  } else if (value > 1000000) {
+    target.setCustomValidity(`Максимальная цена 1000000`);
+  } else {
+    target.setCustomValidity(``);
+  }
+  target.reportValidity();
+};
+
+// Валидация длины введенного значения
+const valueLengthValidation = (target, minValue, maxValue) => {
+  let valueLength = target.value.length;
+  if (valueLength < minValue) {
+    target.setCustomValidity(`Ещё хотя бы ${minValue - valueLength} знака(ов)`);
+  } else if (valueLength > maxValue) {
+    target.setCustomValidity(`Слишком длинно. Удалите лишние ${valueLength - maxValue} знака(ов)`);
+  } else {
+    target.setCustomValidity(``);
+  }
+
+  target.reportValidity();
 };
 
 /* const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
@@ -308,27 +361,44 @@ adForm.action = `https://21.javascript.pages.academy/keksobooking`;
 addressInput.value = `${mainPinStartPosition.x}, ${mainPinStartPosition.y}`;
 disactivatePage();
 
-mainPin.addEventListener(`mousedown`, function (evt) {
+mainPin.addEventListener(`click`, function (evt) {
   evt.preventDefault();
-  if (evt.button === MOUSE_MAIN_BTN) {
-    activatePage();
-    setAddresInputValue();
-  }
+  activatePage();
+  setAddresInputValue();
 });
 
-mainPin.addEventListener(`keydown`, function (evt) {
-  evt.preventDefault();
-  if (evt.key === ETR_KEY) {
-    activatePage();
-    setAddresInputValue();
-  }
+roomsInput.addEventListener(`change`, function (evt) {
+  typeOfRoom = evt.target.value;
+  typeOfCapacity(capacityInput);
 });
 
-capacityInput.addEventListener(`change`, function () {
-  validateGuestsNumber();
+capacityInput.addEventListener(`change`, function (evt) {
+  typeOfCapacity(evt.target);
 });
 
-roomsInput.addEventListener(`change`, function () {
-  validateGuestsNumber();
+// У кнопки "очистить" type="reset", дополнительно сбрасывать форму не нужно
+adFormReset.addEventListener(`click`, function () {
+  disactivatePage();
 });
 
+titleInput.required = true;
+titleInput.minLength = MIN_TITLE_LENGTH;
+titleInput.maxLength = MAX_TITLE_LENGTH;
+
+titleInput.addEventListener(`input`, function (evt) {
+  valueLengthValidation(evt.target, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH);
+});
+
+priceInput.required = true;
+priceInput.max = 1000000;
+priceInput.placeholder = priceOfType[typeOfHouse];
+
+priceInput.addEventListener(`input`, function (evt) {
+  priceValidation(evt.target);
+});
+
+typeInput.addEventListener(`change`, function () {
+  typeOfHouse = typeInput.value;
+  priceInput.placeholder = priceOfType[typeOfHouse];
+  priceValidation(priceInput);
+});
