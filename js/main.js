@@ -197,7 +197,7 @@ const getRandomOffersList = (offersNumber) => {
   return similarOffers;
 };
 
-const renderPin = (pin) => {
+const renderPin = (pin, index) => {
   const pinElement = PIN_TEMPLATE.content.cloneNode(true);
   const pinElementButton = pinElement.querySelector(`.map__pin`);
   const pinElementImage = pinElement.querySelector(`img`);
@@ -205,10 +205,12 @@ const renderPin = (pin) => {
   pinElementButton.style = `left: ${pin.location.x - OFFSET_X}px; top: ${pin.location.y - OFFSET_Y}px`;
   pinElementImage.src = pin.author.avatar;
   pinElementImage.alt = pin.offer.title;
+  pinElementButton.dataset.id = index;
+  pinElementImage.dataset.id = index; // Чтоб не разбираться, нажата кнопка или картинка в ней
 
-  pinElementButton.addEventListener(`click`, function () {
+  /* pinElementButton.addEventListener(`click`, function () {
     openCard(renderCard(pin));
-  });
+  }); */
 
   return pinElement;
 };
@@ -277,7 +279,7 @@ const fillElement = (items) => {
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < items.length; i++) {
-    fragment.appendChild(renderPin(items[i]));
+    fragment.appendChild(renderPin(items[i], i));
   }
 
   return fragment;
@@ -298,8 +300,8 @@ const disactivatePage = () => {
 };
 
 // Активация страницы
+const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
 const activatePage = () => {
-  const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
   const mapPins = fillElement(nearbyOffers);
 
   MAP.classList.remove(`map--faded`);
@@ -446,7 +448,9 @@ const openCard = (card) => {
 
 const closeCard = (evt) => {
   const openedCard = MAP.querySelector(`.map__card`);
-  openedCard.remove();
+  if (openedCard) {
+    openedCard.remove();
+  }
 
   document.removeEventListener(`keydown`, closeCardByEsc);
   evt.target.removeEventListener(`click`, closeCard);
@@ -458,3 +462,16 @@ const closeCardByEsc = (evt) => {
     closeCard(evt);
   }
 };
+
+MAP.addEventListener(`click`, function (evt) {
+  const activePin = MAP.querySelector(`.map__pin--active`);
+  if ((evt.target.classList.contains(`map__pin`) && !evt.target.classList.contains(`map__pin--main`))
+  || (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`))) {
+    if (activePin) {
+      activePin.classList.remove(`.map__pin--active`);
+    }
+    closeCard(evt);
+    openCard(renderCard(nearbyOffers[evt.target.dataset.id]));
+    evt.target.classList.add(`.map__pin--active`);
+  }
+});
