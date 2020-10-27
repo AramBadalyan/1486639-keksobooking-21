@@ -51,12 +51,12 @@ const OFFER_PHOTOS = [
   `http://o0.github.io/assets/images/tokyo/hotel2.jpg`,
   `http://o0.github.io/assets/images/tokyo/hotel3.jpg`
 ];
-/* const HABITATION_TYPE = {
+const HABITATION_TYPE = {
   palace: `Дворец`,
   flat: `Квартира`,
   house: `Дом`,
   bungalow: `Бунгало`
-}; */
+};
 const AVATAR_PATH = `img/avatars/`;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
@@ -70,9 +70,10 @@ const LOC_Y_MAX = 630;
 
 const MAP_PINS = document.querySelector(`.map__pins`);
 const PIN_TEMPLATE = document.querySelector(`#pin`);
-/* const CARD_TEMPLATE = document.querySelector(`#card`); */
+const CARD_TEMPLATE = document.querySelector(`#card`);
 /* const MOUSE_MAIN_BTN = 0; */
 /* const ETR_KEY = `Enter`; */
+const ESC_KEY = `Escape`;
 const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
 
 // Форма нового объявления и фильтрации
@@ -90,6 +91,11 @@ const adFormReset = adForm.querySelector(`.ad-form__reset`);
 const titleInput = adForm.querySelector(`#title`);
 const typeInput = adForm.querySelector(`#type`);
 const priceInput = adForm.querySelector(`#price`);
+const checkInInput = adForm.querySelector(`#timein`);
+const checkOutInput = adForm.querySelector(`#timeout`);
+const avatarInput = adForm.querySelector(`#avatar`);
+const imagesInput = adForm.querySelector(`#images`);
+
 
 const guestCapacity = {
   '1': [`1`],
@@ -191,7 +197,7 @@ const getRandomOffersList = (offersNumber) => {
   return similarOffers;
 };
 
-const renderPin = (pin) => {
+const renderPin = (pin, index) => {
   const pinElement = PIN_TEMPLATE.content.cloneNode(true);
   const pinElementButton = pinElement.querySelector(`.map__pin`);
   const pinElementImage = pinElement.querySelector(`img`);
@@ -199,6 +205,11 @@ const renderPin = (pin) => {
   pinElementButton.style = `left: ${pin.location.x - OFFSET_X}px; top: ${pin.location.y - OFFSET_Y}px`;
   pinElementImage.src = pin.author.avatar;
   pinElementImage.alt = pin.offer.title;
+  pinElementButton.dataset.id = index;
+
+  /* pinElementButton.addEventListener(`click`, function () {
+    openCard(renderCard(pin));
+  }); */
 
   return pinElement;
 };
@@ -210,7 +221,7 @@ const removePins = () => {
   });
 };
 
-/* const renderCard = (offerObj) => {
+const renderCard = (offerObj) => {
   const cardElement = CARD_TEMPLATE.content.cloneNode(true);
   const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
   const cardElementTitle = cardElement.querySelector(`.popup__title`);
@@ -261,13 +272,13 @@ const removePins = () => {
   cardElementPhotosList.appendChild(cardElementPhotos);
 
   return cardElement;
-}; */
+};
 
 const fillElement = (items) => {
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < items.length; i++) {
-    fragment.appendChild(renderPin(items[i]));
+    fragment.appendChild(renderPin(items[i], i));
   }
 
   return fragment;
@@ -283,12 +294,13 @@ const disactivatePage = () => {
   for (let element of filterFormElements) {
     element.disabled = true;
   }
+  addressInput.value = `${mainPinStartPosition.x}, ${mainPinStartPosition.y}`;
   removePins();
 };
 
 // Активация страницы
+const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
 const activatePage = () => {
-  const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
   const mapPins = fillElement(nearbyOffers);
 
   MAP.classList.remove(`map--faded`);
@@ -299,6 +311,7 @@ const activatePage = () => {
   for (let element of filterFormElements) {
     element.disabled = false;
   }
+
   MAP_PINS.appendChild(mapPins);
 };
 
@@ -351,13 +364,17 @@ const valueLengthValidation = (target, minValue, maxValue) => {
   target.reportValidity();
 };
 
-/* const nearbyOffers = getRandomOffersList(OFFERS_NUMBER);
-const mapPins = fillElement(nearbyOffers);
-MAP.classList.remove(`map--faded`);
-MAP_PINS.appendChild(mapPins);
-MAP.insertBefore(renderCard(nearbyOffers[0]), MAP.querySelector(`.map__filters-container`)); */
+// Синхронизация времени заезда/выезда
+const syncInOutTime = (target) => {
+  if (target === checkInInput) {
+    checkOutInput.value = checkInInput.value;
+  } else {
+    checkInInput.value = checkOutInput.value;
+  }
+};
 
 adForm.action = `https://21.javascript.pages.academy/keksobooking`;
+addressInput.readOnly = true;
 addressInput.value = `${mainPinStartPosition.x}, ${mainPinStartPosition.y}`;
 disactivatePage();
 
@@ -401,4 +418,74 @@ typeInput.addEventListener(`change`, function () {
   typeOfHouse = typeInput.value;
   priceInput.placeholder = priceOfType[typeOfHouse];
   priceValidation(priceInput);
+});
+
+avatarInput.accept = `image/*`;
+imagesInput.accept = `image/*`;
+
+checkInInput.addEventListener(`change`, function (evt) {
+  syncInOutTime(evt.target);
+});
+checkOutInput.addEventListener(`change`, function (evt) {
+  syncInOutTime(evt.target);
+});
+
+// Карточки объявлений
+const openCard = (card) => {
+  const openedCard = MAP.querySelector(`.map__card`); // Заменить на метод содержится ли DOM-елемент
+  if (openedCard) {
+    closeCard();
+  }
+
+  const closeButton = card.querySelector(`.popup__close`);
+
+  closeButton.addEventListener(`click`, closeCard);
+  document.addEventListener(`keydown`, closeCardByEsc);
+
+  MAP.insertBefore(card, MAP.querySelector(`.map__filters-container`));
+};
+
+const closeCard = (evt) => {
+  const openedCard = MAP.querySelector(`.map__card`);
+  const activePin = MAP.querySelector(`.map__pin--active`);
+  if (openedCard) {
+    openedCard.remove();
+  }
+  if (activePin) {
+    activePin.classList.remove(`map__pin--active`);
+  }
+
+  document.removeEventListener(`keydown`, closeCardByEsc);
+  evt.target.removeEventListener(`click`, closeCard);
+};
+
+const closeCardByEsc = (evt) => {
+  if (evt.key === ESC_KEY) {
+    evt.preventDefault();
+    closeCard(evt);
+  }
+};
+
+const pinClickHandler = (evt) => {
+  const activePin = MAP.querySelector(`.map__pin--active`);
+  if (evt.target.classList.contains(`map__pin`) && !evt.target.classList.contains(`map__pin--main`)) {
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+    }
+    closeCard(evt);
+    openCard(renderCard(nearbyOffers[evt.target.dataset.id]));
+    evt.target.classList.add(`map__pin--active`);
+  } else if (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`)) {
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+    }
+    closeCard(evt);
+    openCard(renderCard(nearbyOffers[evt.target.parentElement.dataset.id]));
+    evt.target.parentElement.classList.add(`map__pin--active`);
+  }
+};
+
+MAP.addEventListener(`click`, function (evt) {
+  evt.preventDefault();
+  pinClickHandler(evt);
 });
