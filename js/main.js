@@ -206,7 +206,6 @@ const renderPin = (pin, index) => {
   pinElementImage.src = pin.author.avatar;
   pinElementImage.alt = pin.offer.title;
   pinElementButton.dataset.id = index;
-  pinElementImage.dataset.id = index; // Чтоб не разбираться, нажата кнопка или картинка в ней
 
   /* pinElementButton.addEventListener(`click`, function () {
     openCard(renderCard(pin));
@@ -448,8 +447,12 @@ const openCard = (card) => {
 
 const closeCard = (evt) => {
   const openedCard = MAP.querySelector(`.map__card`);
+  const activePin = MAP.querySelector(`.map__pin--active`);
   if (openedCard) {
     openedCard.remove();
+  }
+  if (activePin) {
+    activePin.classList.remove(`map__pin--active`);
   }
 
   document.removeEventListener(`keydown`, closeCardByEsc);
@@ -463,15 +466,26 @@ const closeCardByEsc = (evt) => {
   }
 };
 
-MAP.addEventListener(`click`, function (evt) {
+const pinClickHandler = (evt) => {
   const activePin = MAP.querySelector(`.map__pin--active`);
-  if ((evt.target.classList.contains(`map__pin`) && !evt.target.classList.contains(`map__pin--main`))
-  || (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`))) {
+  if (evt.target.classList.contains(`map__pin`) && !evt.target.classList.contains(`map__pin--main`)) {
     if (activePin) {
-      activePin.classList.remove(`.map__pin--active`);
+      activePin.classList.remove(`map__pin--active`);
     }
     closeCard(evt);
     openCard(renderCard(nearbyOffers[evt.target.dataset.id]));
-    evt.target.classList.add(`.map__pin--active`);
+    evt.target.classList.add(`map__pin--active`);
+  } else if (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`)) {
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+    }
+    closeCard(evt);
+    openCard(renderCard(nearbyOffers[evt.target.parentElement.dataset.id]));
+    evt.target.parentElement.classList.add(`map__pin--active`);
   }
+};
+
+MAP.addEventListener(`click`, function (evt) {
+  evt.preventDefault();
+  pinClickHandler(evt);
 });
