@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  const ESC_KEY = `Escape`;
 
   const getRandomInt = (max) => {
     return Math.floor(Math.random() * Math.floor(max));
@@ -28,7 +27,6 @@
   };
 
   window.util = {
-    ESC_KEY,
     getRandomInt,
     getRandomIntInclusive,
     getRandomDescription

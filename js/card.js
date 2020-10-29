@@ -1,14 +1,9 @@
 'use strict';
 
 (function () {
+  const CARD_TEMPLATE = document.querySelector(`#card`);
+
   const renderCard = (offerObj) => {
-    const HABITATION_TYPE = {
-      palace: `Дворец`,
-      flat: `Квартира`,
-      house: `Дом`,
-      bungalow: `Бунгало`
-    };
-    const CARD_TEMPLATE = document.querySelector(`#card`);
     const cardElement = CARD_TEMPLATE.content.cloneNode(true);
     const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
     const cardElementTitle = cardElement.querySelector(`.popup__title`);
@@ -26,7 +21,7 @@
     cardElementTitle.textContent = offerObj.offer.title;
     cardElementAddress.textContent = offerObj.offer.address;
     cardElementPrice.innerHTML = `${offerObj.offer.price}&#x20bd;<span>/ночь</span>`;
-    cardElementType.textContent = HABITATION_TYPE[offerObj.offer.type];
+    cardElementType.textContent = window.constants.HABITATION_TYPE[offerObj.offer.type];
     cardElementCapacity.textContent = `${offerObj.offer.rooms} комнаты для ${offerObj.offer.guests} гостей`;
     cardElementTime.textContent = `Заезд после ${offerObj.offer.checkin}, выезд до ${offerObj.offer.checkout}`;
     cardElementDescription.textContent = offerObj.offer.description;
@@ -91,7 +86,7 @@
   };
 
   const closeCardByEsc = (evt) => {
-    if (evt.key === window.util.ESC_KEY) {
+    if (evt.key === window.constants.ESC_KEY) {
       evt.preventDefault();
       closeCard(evt);
     }

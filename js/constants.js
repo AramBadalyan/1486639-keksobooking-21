@@ -12,6 +12,13 @@
   const LOC_X_MAX = MAP.clientWidth - OFFSET_X;
   const LOC_Y_MIN = 130;
   const LOC_Y_MAX = 630;
+  const ESC_KEY = `Escape`;
+  const HABITATION_TYPE = {
+    palace: `Дворец`,
+    flat: `Квартира`,
+    house: `Дом`,
+    bungalow: `Бунгало`
+  };
 
   const mainPin = MAP.querySelector(`.map__pin--main`);
   const mainPinWidth = mainPin.clientWidth;
@@ -33,6 +40,8 @@
     LOC_Y_MIN,
     LOC_Y_MAX,
     MAP,
+    ESC_KEY,
+    HABITATION_TYPE,
     mainPin,
     mainPinAddress,
     mainPinStartPosition
