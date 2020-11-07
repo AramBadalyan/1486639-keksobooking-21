@@ -11,7 +11,9 @@
     for (let element of window.form.filterFormElements) {
       element.disabled = true;
     }
-    window.form.addressInput.value = `${window.constants.mainPinStartPosition.x}, ${window.constants.mainPinStartPosition.y}`;
+    window.constants.mainPin.style.left = `${window.constants.mainPinStartPosition.x}px`;
+    window.constants.mainPin.style.top = `${window.constants.mainPinStartPosition.y}px`;
+    window.pin.setCoordinates(false);
     window.pin.removePins();
   };
 
@@ -28,6 +30,7 @@
       element.disabled = false;
     }
 
+    window.pin.setCoordinates(true);
     window.pin.MAP_PINS.appendChild(mapPins);
   };
 

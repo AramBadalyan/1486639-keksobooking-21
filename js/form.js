@@ -20,11 +20,6 @@
   const avatarInput = adForm.querySelector(`#avatar`);
   const imagesInput = adForm.querySelector(`#images`);
 
-  // Заполнение поля Адрес
-  const setAddresInputValue = () => {
-    addressInput.value = `${window.constants.mainPinAddress.x}, ${window.constants.mainPinAddress.y}`;
-  };
-
   // Синхронизация времени заезда/выезда
   const syncInOutTime = (target) => {
     if (target === checkInInput) {
@@ -36,7 +31,7 @@
 
   adForm.action = `https://21.javascript.pages.academy/keksobooking`;
   addressInput.readOnly = true;
-  addressInput.value = `${window.constants.mainPinStartPosition.x}, ${window.constants.mainPinStartPosition.y}`;
+  window.pin.setCoordinates(false);
 
   roomsInput.addEventListener(`change`, function (evt) {
     window.formValidation.typeOfRoom = evt.target.value;
@@ -91,7 +86,6 @@
     adFormElements,
     addressInput,
 
-    setAddresInputValue,
     syncInOutTime
   };
 })();
