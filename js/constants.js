@@ -8,8 +8,8 @@
   const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
   const OFFSET_X = PIN_WIDTH / 2;
   const OFFSET_Y = PIN_HEIGHT;
-  const LOC_X_MIN = 0 + OFFSET_X;
-  const LOC_X_MAX = MAP.clientWidth - OFFSET_X;
+  const LOC_X_MIN = 0/*  + OFFSET_X */;
+  const LOC_X_MAX = MAP.clientWidth/*  - OFFSET_X */;
   const LOC_Y_MIN = 130;
   const LOC_Y_MAX = 630;
   const ESC_KEY = `Escape`;
@@ -23,16 +23,13 @@
   const mainPin = MAP.querySelector(`.map__pin--main`);
   const mainPinWidth = mainPin.clientWidth;
   const mainPinHeight = mainPin.clientHeight;
-  const mainPinAddress = {
-    x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
-    y: Math.round(mainPin.offsetTop + mainPinHeight + POINTER_HEIGHT)
-  };
   const mainPinStartPosition = {
-    x: Math.round(mainPin.offsetLeft + mainPinWidth / 2),
-    y: Math.round(mainPin.offsetTop + mainPinHeight / 2)
+    x: mainPin.offsetLeft,
+    y: mainPin.offsetTop
   };
 
   window.constants = {
+    POINTER_HEIGHT,
     OFFSET_X,
     OFFSET_Y,
     LOC_X_MIN,
@@ -42,8 +39,9 @@
     MAP,
     ESC_KEY,
     HABITATION_TYPE,
+    mainPinWidth,
+    mainPinHeight,
     mainPin,
-    mainPinAddress,
     mainPinStartPosition
   };
 })();
