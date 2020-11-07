@@ -4,7 +4,9 @@ window.page.disactivatePage();
 
 window.constants.mainPin.addEventListener(`mousedown`, function (evt) {
   evt.preventDefault();
-  window.page.activatePage();
+  if (!window.page.isPageActive) {
+    window.page.activatePage();
+  }
   window.pin.movePin(evt);
 });
 
