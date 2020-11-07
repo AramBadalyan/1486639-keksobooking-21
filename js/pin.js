@@ -93,10 +93,10 @@
         window.constants.mainPin.style.left = `${Coordinates.x.max - window.constants.mainPin.offsetWidth / 2}px`;
       }
 
-      if (window.constants.mainPin.offsetTop < Coordinates.y.min - window.constants.mainPin.offsetWidth / 2) {
-        window.constants.mainPin.style.top = `${Coordinates.y.min - window.constants.mainPin.offsetWidth / 2}px`;
-      } else if (window.constants.mainPin.offsetTop > Coordinates.y.max - window.constants.mainPin.offsetWidth / 2) {
-        window.constants.mainPin.style.top = `${Coordinates.y.max - window.constants.mainPin.offsetWidth / 2}px`;
+      if (window.constants.mainPin.offsetTop < Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
+        window.constants.mainPin.style.top = `${Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
+      } else if (window.constants.mainPin.offsetTop > Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
+        window.constants.mainPin.style.top = `${Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
       }
 
       setCoordinates(true);
