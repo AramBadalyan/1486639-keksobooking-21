@@ -20,6 +20,63 @@
   const avatarInput = adForm.querySelector(`#avatar`);
   const imagesInput = adForm.querySelector(`#images`);
 
+  const successMessageTemplate = document.querySelector(`#success`);
+  const errorMessageTemplate = document.querySelector(`#error`);
+
+  // Success message
+  const showSuccessMessage = () => {
+    const successMessage = successMessageTemplate.content.cloneNode(true);
+
+    document.addEventListener(`click`, hideSuccessMessage);
+    document.addEventListener(`keydown`, hideSuccessMessageByEsc);
+
+    window.constants.pageMain.appendChild(successMessage);
+  };
+
+  const hideSuccessMessage = (evt) => {
+    evt.preventDefault();
+    const message = window.constants.pageMain.querySelector(`.success`);
+    window.constants.pageMain.removeChild(message);
+
+    document.removeEventListener(`click`, hideSuccessMessage);
+    document.removeEventListener(`keydown`, hideSuccessMessageByEsc);
+  };
+
+  const hideSuccessMessageByEsc = (evt) => {
+    if (evt.key === window.constants.ESC_KEY) {
+      hideSuccessMessage(evt);
+    }
+  };
+
+  // Error message
+  const showErrorMessage = () => {
+    const errorMessage = errorMessageTemplate.content.cloneNode(true);
+    const closeButton = errorMessage.querySelector(`.error__button`);
+
+    document.addEventListener(`click`, hideErrorMessage);
+    document.addEventListener(`keydown`, hideErrorMessageByEsc);
+    closeButton.addEventListener(`click`, hideErrorMessage);
+
+    window.constants.pageMain.appendChild(errorMessage);
+  };
+
+  const hideErrorMessage = (evt) => {
+    evt.preventDefault();
+    const message = window.constants.pageMain.querySelector(`.error`);
+    const errorButton = message.querySelector(`.error__button`);
+    window.constants.pageMain.removeChild(message);
+
+    document.removeEventListener(`click`, hideErrorMessage);
+    document.removeEventListener(`keydown`, hideErrorMessageByEsc);
+    errorButton.removeEventListener(`click`, hideErrorMessage);
+  };
+
+  const hideErrorMessageByEsc = (evt) => {
+    if (evt.key === window.constants.ESC_KEY) {
+      hideErrorMessage(evt);
+    }
+  };
+
   // Синхронизация времени заезда/выезда
   const syncInOutTime = (target) => {
     if (target === checkInInput) {
@@ -77,6 +134,20 @@
   });
   checkOutInput.addEventListener(`change`, function (evt) {
     syncInOutTime(evt.target);
+  });
+
+  adForm.addEventListener(`submit`, function (evt) {
+    window.server.upload(
+        new FormData(adForm),
+        function () {
+          adForm.reset();
+          window.page.disactivatePage();
+          showSuccessMessage();
+        },
+        function () {
+          showErrorMessage();
+        });
+    evt.preventDefault();
   });
 
   window.form = {

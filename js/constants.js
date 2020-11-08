@@ -21,6 +21,7 @@
     bungalow: `Бунгало`
   };
 
+  const pageMain = document.querySelector(`main`);
   const mainPin = MAP.querySelector(`.map__pin--main`);
   const mainPinWidth = mainPin.clientWidth;
   const mainPinHeight = mainPin.clientHeight;
@@ -41,6 +42,7 @@
     MAP,
     ESC_KEY,
     HABITATION_TYPE,
+    pageMain,
     mainPinWidth,
     mainPinHeight,
     mainPin,
