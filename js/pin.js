@@ -14,6 +14,7 @@
       max: 630
     }
   };
+  let loadedOffers = [];
 
   const renderPin = (pin, index) => {
     const pinElement = PIN_TEMPLATE.content.cloneNode(true);
@@ -42,14 +43,14 @@
         activePin.classList.remove(`map__pin--active`);
       }
       window.card.closeCard(evt);
-      window.card.openCard(window.card.renderCard(window.data.nearbyOffers[evt.target.dataset.id]));
+      window.card.openCard(window.card.renderCard(window.pin.loadedOffers[evt.target.dataset.id]));
       evt.target.classList.add(`map__pin--active`);
     } else if (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`)) {
       if (activePin) {
         activePin.classList.remove(`map__pin--active`);
       }
       window.card.closeCard(evt);
-      window.card.openCard(window.card.renderCard(window.data.nearbyOffers[evt.target.parentElement.dataset.id]));
+      window.card.openCard(window.card.renderCard(window.pin.loadedOffers[evt.target.parentElement.dataset.id]));
       evt.target.parentElement.classList.add(`map__pin--active`);
     }
   };
@@ -116,6 +117,7 @@
 
   window.pin = {
     MAP_PINS,
+    loadedOffers,
 
     renderPin,
     removePins,

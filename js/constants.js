@@ -3,6 +3,7 @@
 (function () {
   const MAP = document.querySelector(`.map`);
 
+  const MAX_PINS_ON_MAP = 5;
   const PIN_WIDTH = 50;
   const PIN_HEIGHT = 70;
   const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
@@ -29,6 +30,7 @@
   };
 
   window.constants = {
+    MAX_PINS_ON_MAP,
     POINTER_HEIGHT,
     OFFSET_X,
     OFFSET_Y,
