@@ -1,14 +1,7 @@
 'use strict';
 
 window.page.disactivatePage();
-
-window.constants.mainPin.addEventListener(`mousedown`, function (evt) {
-  evt.preventDefault();
-  if (!window.page.isPageActive) {
-    window.page.activatePage();
-  }
-  window.pin.movePin(evt);
-});
+window.constants.mainPin.addEventListener(`mousedown`, window.pin.movePin);
 
 window.constants.MAP.addEventListener(`click`, function (evt) {
   evt.preventDefault();

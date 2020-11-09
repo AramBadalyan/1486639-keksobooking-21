@@ -67,52 +67,54 @@
   };
 
   const movePin = (evt) => {
-    let startCoords = {
-      x: evt.clientX,
-      y: evt.clientY
-    };
-
-    const onMouseMove = (moveEvt) => {
-      moveEvt.preventDefault();
-
-      let delta = {
-        x: startCoords.x - moveEvt.clientX,
-        y: startCoords.y - moveEvt.clientY
+    if (evt.button === window.constants.MOUSE_MAIN_BUTTON) {
+      let startCoords = {
+        x: evt.clientX,
+        y: evt.clientY
       };
 
-      window.constants.mainPin.style.left = `${window.constants.mainPin.offsetLeft - delta.x}px`;
-      window.constants.mainPin.style.top = `${window.constants.mainPin.offsetTop - delta.y}px`;
+      const onMouseMove = (moveEvt) => {
+        moveEvt.preventDefault();
 
-      startCoords = {
-        x: moveEvt.clientX,
-        y: moveEvt.clientY
+        let delta = {
+          x: startCoords.x - moveEvt.clientX,
+          y: startCoords.y - moveEvt.clientY
+        };
+
+        window.constants.mainPin.style.left = `${window.constants.mainPin.offsetLeft - delta.x}px`;
+        window.constants.mainPin.style.top = `${window.constants.mainPin.offsetTop - delta.y}px`;
+
+        startCoords = {
+          x: moveEvt.clientX,
+          y: moveEvt.clientY
+        };
+
+        if (window.constants.mainPin.offsetLeft <= Coordinates.x.min - window.constants.mainPin.offsetWidth / 2) {
+          window.constants.mainPin.style.left = `${Coordinates.x.min - window.constants.mainPin.offsetWidth / 2}px`;
+        } else if (window.constants.mainPin.offsetLeft >= Coordinates.x.max - window.constants.mainPin.offsetWidth / 2) {
+          window.constants.mainPin.style.left = `${Coordinates.x.max - window.constants.mainPin.offsetWidth / 2}px`;
+        }
+
+        if (window.constants.mainPin.offsetTop < Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
+          window.constants.mainPin.style.top = `${Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
+        } else if (window.constants.mainPin.offsetTop > Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
+          window.constants.mainPin.style.top = `${Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
+        }
+
+        setCoordinates(true);
       };
 
-      if (window.constants.mainPin.offsetLeft <= Coordinates.x.min - window.constants.mainPin.offsetWidth / 2) {
-        window.constants.mainPin.style.left = `${Coordinates.x.min - window.constants.mainPin.offsetWidth / 2}px`;
-      } else if (window.constants.mainPin.offsetLeft >= Coordinates.x.max - window.constants.mainPin.offsetWidth / 2) {
-        window.constants.mainPin.style.left = `${Coordinates.x.max - window.constants.mainPin.offsetWidth / 2}px`;
-      }
+      const onMouseUp = (upEvt) => {
+        upEvt.preventDefault();
+        setCoordinates(true);
 
-      if (window.constants.mainPin.offsetTop < Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
-        window.constants.mainPin.style.top = `${Coordinates.y.min - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
-      } else if (window.constants.mainPin.offsetTop > Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT) {
-        window.constants.mainPin.style.top = `${Coordinates.y.max - window.constants.mainPin.offsetHeight - window.constants.POINTER_HEIGHT}px`;
-      }
+        document.removeEventListener(`mousemove`, onMouseMove);
+        document.removeEventListener(`mouseup`, onMouseUp);
+      };
 
-      setCoordinates(true);
-    };
-
-    const onMouseUp = (upEvt) => {
-      upEvt.preventDefault();
-      setCoordinates(true);
-
-      document.removeEventListener(`mousemove`, onMouseMove);
-      document.removeEventListener(`mouseup`, onMouseUp);
-    };
-
-    document.addEventListener(`mousemove`, onMouseMove);
-    document.addEventListener(`mouseup`, onMouseUp);
+      document.addEventListener(`mousemove`, onMouseMove);
+      document.addEventListener(`mouseup`, onMouseUp);
+    }
   };
 
   window.pin = {
