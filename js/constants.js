@@ -14,6 +14,7 @@
   const LOC_Y_MIN = 130;
   const LOC_Y_MAX = 630;
   const ESC_KEY = `Escape`;
+  const MOUSE_MAIN_BUTTON = 0;
   const HABITATION_TYPE = {
     palace: `Дворец`,
     flat: `Квартира`,
@@ -41,6 +42,7 @@
     LOC_Y_MAX,
     MAP,
     ESC_KEY,
+    MOUSE_MAIN_BUTTON,
     HABITATION_TYPE,
     pageMain,
     mainPinWidth,
