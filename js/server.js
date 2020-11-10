@@ -13,6 +13,7 @@
   const StatusCode = {
     OK: 200
   };
+  let loadedOffers;
 
   const load = (onSuccess, onError) => {
 
@@ -24,6 +25,7 @@
     xhr.addEventListener(`load`, function () {
       if (xhr.status === StatusCode.OK) {
         onSuccess(xhr.response);
+        window.server.loadedOffers = xhr.response;
       } else {
         onError(`Статус ответа: ${xhr.status} ${xhr.statusText}`);
       }
@@ -60,6 +62,8 @@
   };
 
   window.server = {
+    loadedOffers,
+
     load,
     upload
   };
