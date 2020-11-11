@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  const ANY_VALUE = `any`;
   const MIN_TITLE_LENGTH = 30;
   const MAX_TITLE_LENGTH = 100;
 
@@ -85,6 +86,21 @@
       checkInInput.value = checkOutInput.value;
     }
   };
+
+  const filterOffersByType = (offers, value) => {
+    if (value === ANY_VALUE) {
+      return offers;
+    }
+    const offersCopy = offers.filter(function (element) {
+      return element.offer[`type`] === value;
+    });
+    return offersCopy;
+  };
+
+  filterForm.addEventListener(`change`, function (evt) {
+    window.card.closeCard(evt);
+    window.map.fillElement(filterOffersByType(window.server.loadedOffers, evt.target.value));
+  });
 
   adForm.action = `https://21.javascript.pages.academy/keksobooking`;
   addressInput.readOnly = true;

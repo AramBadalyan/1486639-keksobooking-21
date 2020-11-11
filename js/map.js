@@ -1,7 +1,15 @@
 'use strict';
 
 (function () {
+  const clearMap = () => {
+    const pinsOnMap = window.pin.MAP_PINS.querySelectorAll(`.map__pin:not(.map__pin--main)`);
+    pinsOnMap.forEach(function (pin) {
+      pin.remove();
+    });
+  };
+
   const fillElement = (items) => {
+    clearMap();
     const offersCount = window.constants.MAX_PINS_ON_MAP < items.length ? window.constants.MAX_PINS_ON_MAP : items.length; // требование ТЗ 5.9
     const fragment = document.createDocumentFragment();
 
