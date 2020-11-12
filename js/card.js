@@ -71,18 +71,19 @@
     window.constants.MAP.insertBefore(card, window.constants.MAP.querySelector(`.map__filters-container`));
   };
 
-  const closeCard = (evt) => {
+  const closeCard = () => {
     const openedCard = window.constants.MAP.querySelector(`.map__card`);
     const activePin = window.constants.MAP.querySelector(`.map__pin--active`);
     if (openedCard) {
+      const closeButton = openedCard.querySelector(`.popup__close`);
       openedCard.remove();
+      closeButton.removeEventListener(`click`, closeCard);
     }
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
 
     document.removeEventListener(`keydown`, closeCardByEsc);
-    evt.target.removeEventListener(`click`, closeCard);
   };
 
   const closeCardByEsc = (evt) => {

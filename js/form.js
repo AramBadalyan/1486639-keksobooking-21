@@ -12,6 +12,8 @@
   const roomsInput = adForm.querySelector(`#room_number`);
   const capacityInput = adForm.querySelector(`#capacity`);
   const adFormReset = adForm.querySelector(`.ad-form__reset`);
+  const adFormSubmit = adForm.querySelector(`.ad-form__submit`);
+  const adFormInputs = adForm.querySelectorAll(`input`);
   const titleInput = adForm.querySelector(`#title`);
   const typeInput = adForm.querySelector(`#type`);
   const priceInput = adForm.querySelector(`#price`);
@@ -99,8 +101,9 @@
     window.formValidation.typeOfCapacity(evt.target);
   });
 
-  // У кнопки "очистить" type="reset", дополнительно сбрасывать форму не нужно
   adFormReset.addEventListener(`click`, function () {
+    adForm.reset();
+    filterForm.reset();
     window.page.disactivatePage();
   });
 
@@ -123,6 +126,7 @@
   typeInput.addEventListener(`change`, function () {
     window.formValidation.typeOfHouse = typeInput.value;
     priceInput.placeholder = window.formValidation.priceOfType[window.formValidation.typeOfHouse];
+    priceInput.min = window.formValidation.priceOfType[window.formValidation.typeOfHouse];
     window.formValidation.priceValidation(priceInput);
   });
 
@@ -136,10 +140,21 @@
     syncInOutTime(evt.target);
   });
 
+  adFormSubmit.addEventListener(`click`, function () {
+    adFormInputs.forEach(function (adFormElement) {
+      if (!adFormElement.validity.valid) {
+        adFormElement.style = window.formValidation.errorNotice;
+      } else {
+        adFormElement.style = window.formValidation.nonNotice;
+      }
+    });
+  });
+
   adForm.addEventListener(`submit`, function (evt) {
     window.server.upload(
         new FormData(adForm),
         function () {
+          filterForm.reset();
           adForm.reset();
           window.page.disactivatePage();
           showSuccessMessage();

@@ -16,7 +16,10 @@
     window.pin.loadedOffers = items;
 
     for (let i = 0; i < offersCount; i++) {
-      fragment.appendChild(window.pin.renderPin(items[i], i));
+      let isOfferInItem = items[i].offer;
+      if (isOfferInItem) { // требование ТЗ 5.3
+        fragment.appendChild(window.pin.renderPin(items[i], i));
+      }
     }
 
     window.pin.MAP_PINS.appendChild(fragment);
