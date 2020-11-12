@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  const errorNotice = `box-shadow: 0 0 5px 5px rgba(255, 55, 55, 0.5);`;
+  const nonNotice = `box-shadow: 0;`;
   const guestValidation = {
     '1': `Только на одного гостя`,
     '2': `Только на одного или двух гостей`,
@@ -19,8 +21,6 @@
     'house': 5000,
     'palace': 10000
   };
-  /* let typeOfRoom = `1`;
-  let typeOfHouse = `flat`; */
 
   // Валидация поля Количество мест
   const typeOfCapacity = (target) => {
@@ -29,8 +29,10 @@
       return element === value;
     });
     if (!isValid) {
+      target.style = errorNotice;
       target.setCustomValidity(guestValidation[window.formValidation.typeOfRoom]);
     } else {
+      target.style = nonNotice;
       target.setCustomValidity(``);
     }
 
@@ -67,6 +69,8 @@
   };
 
   window.formValidation = {
+    errorNotice,
+    nonNotice,
     guestValidation,
     guestCapacity,
     priceOfType,
