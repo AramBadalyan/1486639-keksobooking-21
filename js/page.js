@@ -1,6 +1,9 @@
 'use strict';
 
 
+const avatarPreview = document.querySelector(`.ad-form-header__preview img`);
+const photoPreview = document.querySelector(`.ad-form__photo`);
+
 const errorHandler = (errorMessage) => {
   const node = document.createElement(`div`);
   node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: #f0f0ea; vertical-align: middle`;
@@ -14,6 +17,12 @@ const errorHandler = (errorMessage) => {
   node.textContent = `${errorMessage}.
     Укажите местоположение вашего объявления без соседних`;
   document.body.insertAdjacentElement(`afterbegin`, node);
+};
+
+// Сброс превью загруженных картинок
+const resetImagesPreview = () => {
+  avatarPreview.src = `img/muffin-grey.svg`;
+  photoPreview.innerHTML = ``;
 };
 
 // Перевод страницы в неактивное состояние
@@ -31,6 +40,7 @@ const disactivatePage = () => {
   window.card.closeCard();
   window.pin.setCoordinates(false);
   window.pin.removePins();
+  resetImagesPreview();
 
   window.constants.mainPin.addEventListener(`mousedown`, activatePage);
 };

@@ -21,6 +21,7 @@ const HABITATION_TYPE = {
   house: `Дом`,
   bungalow: `Бунгало`
 };
+const IMAGE_TYPES = [`gif`, `jpeg`, `jpg`, `png`];
 
 const pageMain = document.querySelector(`main`);
 const mainPin = MAP.querySelector(`.map__pin--main`);
@@ -44,6 +45,7 @@ window.constants = {
   ESC_KEY,
   MOUSE_MAIN_BUTTON,
   HABITATION_TYPE,
+  IMAGE_TYPES,
   pageMain,
   mainPinWidth,
   mainPinHeight,
