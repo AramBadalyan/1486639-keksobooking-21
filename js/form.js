@@ -21,6 +21,8 @@ const checkInInput = adForm.querySelector(`#timein`);
 const checkOutInput = adForm.querySelector(`#timeout`);
 const avatarInput = adForm.querySelector(`#avatar`);
 const imagesInput = adForm.querySelector(`#images`);
+const avatarPreview = adForm.querySelector(`.ad-form-header__preview img`);
+const photoPreview = adForm.querySelector(`.ad-form__photo`);
 
 const successMessageTemplate = document.querySelector(`#success`);
 const errorMessageTemplate = document.querySelector(`#error`);
@@ -88,6 +90,26 @@ const syncInOutTime = (target) => {
   }
 };
 
+// Вывод превью загруженных изображений
+const setImageToPreview = (input, preview) => {
+  const image = input.files[0];
+  const imageName = image.name.toLowerCase();
+
+  const isImage = window.constants.IMAGE_TYPES.some(function (type) {
+    return imageName.endsWith(type);
+  });
+
+  if (isImage) {
+    const reader = new FileReader();
+
+    reader.addEventListener(`load`, function () {
+      preview.src = reader.result;
+    });
+
+    reader.readAsDataURL(image);
+  }
+};
+
 adForm.action = `https://21.javascript.pages.academy/keksobooking`;
 addressInput.readOnly = true;
 window.pin.setCoordinates(false);
@@ -132,6 +154,23 @@ typeInput.addEventListener(`change`, function () {
 
 avatarInput.accept = `image/*`;
 imagesInput.accept = `image/*`;
+
+avatarInput.addEventListener(`change`, function () {
+  setImageToPreview(avatarInput, avatarPreview);
+});
+
+
+imagesInput.addEventListener(`change`, function () {
+  const offerPhoto = document.createElement(`img`);
+  offerPhoto.style.width = `100%`;
+  offerPhoto.style.height = `auto`;
+  offerPhoto.alt = `Фотография жилья`;
+
+  setImageToPreview(imagesInput, offerPhoto);
+
+  photoPreview.innerHTML = ``;
+  photoPreview.appendChild(offerPhoto);
+});
 
 checkInInput.addEventListener(`change`, function (evt) {
   syncInOutTime(evt.target);
