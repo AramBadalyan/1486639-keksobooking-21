@@ -1,6 +1,5 @@
 'use strict';
 
-
 const MAP_PINS = document.querySelector(`.map__pins`);
 const PIN_TEMPLATE = document.querySelector(`#pin`);
 const inputaddress = document.querySelector(`#address`);
@@ -16,7 +15,7 @@ const Coordinates = {
 };
 let loadedOffers = [];
 
-const renderPin = (pin, index) => {
+const render = (pin, index) => {
   const pinElement = PIN_TEMPLATE.content.cloneNode(true);
   const pinElementButton = pinElement.querySelector(`.map__pin`);
   const pinElementImage = pinElement.querySelector(`img`);
@@ -29,28 +28,28 @@ const renderPin = (pin, index) => {
   return pinElement;
 };
 
-const removePins = () => {
+const removeAll = () => {
   const pins = window.constants.MAP.querySelectorAll(`.map__pin:not(.map__pin--main)`);
-  pins.forEach(function (pin) {
+  pins.forEach((pin) => {
     pin.remove();
   });
 };
 
-const pinClickHandler = (evt) => {
+const onClick = (evt) => {
   const activePin = window.constants.MAP.querySelector(`.map__pin--active`);
   if (evt.target.classList.contains(`map__pin`) && !evt.target.classList.contains(`map__pin--main`)) {
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
-    window.card.closeCard(evt);
-    window.card.openCard(window.card.renderCard(window.pin.loadedOffers[evt.target.dataset.id]));
+    window.card.onClose(evt);
+    window.card.openElement(window.card.render(window.pin.loadedOffers[evt.target.dataset.id]));
     evt.target.classList.add(`map__pin--active`);
   } else if (evt.target.parentElement.classList.contains(`map__pin`) && !evt.target.parentElement.classList.contains(`map__pin--main`)) {
     if (activePin) {
       activePin.classList.remove(`map__pin--active`);
     }
-    window.card.closeCard(evt);
-    window.card.openCard(window.card.renderCard(window.pin.loadedOffers[evt.target.parentElement.dataset.id]));
+    window.card.onClose(evt);
+    window.card.openElement(window.card.render(window.pin.loadedOffers[evt.target.parentElement.dataset.id]));
     evt.target.parentElement.classList.add(`map__pin--active`);
   }
 };
@@ -66,7 +65,7 @@ const setCoordinates = (isPageActive) => {
   inputaddress.value = `${mainPinX}, ${mainPinY}`;
 };
 
-const movePin = (evt) => {
+const onMove = (evt) => {
   if (evt.button === window.constants.MOUSE_MAIN_BUTTON) {
     let startCoords = {
       x: evt.clientX,
@@ -121,9 +120,9 @@ window.pin = {
   MAP_PINS,
   loadedOffers,
 
-  renderPin,
-  removePins,
-  pinClickHandler,
+  render,
+  removeAll,
+  onClick,
   setCoordinates,
-  movePin
+  onMove
 };

@@ -1,6 +1,5 @@
 'use strict';
 
-
 const errorNotice = `box-shadow: 0 0 5px 5px rgba(255, 55, 55, 0.5);`;
 const nonNotice = `box-shadow: 0;`;
 const guestValidation = {
@@ -25,7 +24,7 @@ const priceOfType = {
 // Валидация поля Количество мест
 const typeOfCapacity = (target) => {
   const value = target.value;
-  const isValid = guestCapacity[window.formValidation.typeOfRoom].some(function (element) {
+  const isValid = guestCapacity[window.formValidation.typeOfRoom].some((element) => {
     return element === value;
   });
   if (!isValid) {
@@ -40,7 +39,7 @@ const typeOfCapacity = (target) => {
 };
 
 // Валидация Типа жилья и Цены за ночь
-const priceValidation = function (target) {
+const price = (target) => {
   const value = target.value;
   if (target.validity.valueMissing) {
     target.setCustomValidity(`Обязательное поле`);
@@ -55,12 +54,12 @@ const priceValidation = function (target) {
 };
 
 // Валидация длины введенного значения
-const valueLengthValidation = (target, minValue, maxValue) => {
-  let valueLength = target.value.length;
-  if (valueLength < minValue) {
-    target.setCustomValidity(`Ещё хотя бы ${minValue - valueLength} знака(ов)`);
-  } else if (valueLength > maxValue) {
-    target.setCustomValidity(`Слишком длинно. Удалите лишние ${valueLength - maxValue} знака(ов)`);
+const valueLength = (target, minValue, maxValue) => {
+  let length = target.value.length;
+  if (length < minValue) {
+    target.setCustomValidity(`Ещё хотя бы ${minValue - length} знака(ов)`);
+  } else if (length > maxValue) {
+    target.setCustomValidity(`Слишком длинно. Удалите лишние ${length - maxValue} знака(ов)`);
   } else {
     target.setCustomValidity(``);
   }
@@ -78,6 +77,6 @@ window.formValidation = {
   typeOfHouse: `flat`,
 
   typeOfCapacity,
-  priceValidation,
-  valueLengthValidation
+  price,
+  valueLength
 };

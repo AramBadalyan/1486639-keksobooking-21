@@ -1,9 +1,9 @@
 'use strict';
 
-window.page.disactivatePage();
-window.constants.mainPin.addEventListener(`mousedown`, window.pin.movePin);
+window.page.disactivate();
+window.constants.mainPin.addEventListener(`mousedown`, window.pin.onMove);
 
-window.pin.MAP_PINS.addEventListener(`click`, function (evt) {
+window.pin.MAP_PINS.addEventListener(`click`, (evt) => {
   evt.preventDefault();
-  window.pin.pinClickHandler(evt);
+  window.pin.onClick(evt);
 });
