@@ -1,9 +1,8 @@
 'use strict';
 
-
 const CARD_TEMPLATE = document.querySelector(`#card`);
 
-const renderCard = (offerObj) => {
+const render = (offerObj) => {
   const cardElement = CARD_TEMPLATE.content.cloneNode(true);
   const cardElementAvatar = cardElement.querySelector(`.popup__avatar`);
   const cardElementTitle = cardElement.querySelector(`.popup__title`);
@@ -32,23 +31,23 @@ const renderCard = (offerObj) => {
   const cardElementFeatures = document.createDocumentFragment();
   const cardElementPhotos = document.createDocumentFragment();
 
-  for (let i = 0; i < offerObj.offer.features.length; i++) {
+  offerObj.offer.features.forEach((feature) => {
     let newFeature = document.createElement(`li`);
-    newFeature.classList.add(`popup__feature`, `popup__feature--${offerObj.offer.features[i]}`);
+    newFeature.classList.add(`popup__feature`, `popup__feature--${feature}`);
 
     cardElementFeatures.appendChild(newFeature);
-  }
+  });
 
-  for (let i = 0; i < offerObj.offer.photos.length; i++) {
+  offerObj.offer.photos.forEach((photo) => {
     let newPhoto = document.createElement(`img`);
     newPhoto.classList.add(`popup__photo`);
     newPhoto.width = 45;
     newPhoto.height = 40;
     newPhoto.alt = `Фотография жилья`;
-    newPhoto.src = offerObj.offer.photos[i];
+    newPhoto.src = photo;
 
     cardElementPhotos.appendChild(newPhoto);
-  }
+  });
 
   cardElementFeaturesList.appendChild(cardElementFeatures);
   cardElementPhotosList.appendChild(cardElementPhotos);
@@ -57,45 +56,45 @@ const renderCard = (offerObj) => {
 };
 
 // Карточки объявлений
-const openCard = (card) => {
+const openElement = (card) => {
   const openedCard = window.constants.MAP.querySelector(`.map__card`); // Заменить на метод содержится ли DOM-елемент
   if (openedCard) {
-    closeCard();
+    onClose();
   }
 
   const closeButton = card.querySelector(`.popup__close`);
 
-  closeButton.addEventListener(`click`, closeCard);
-  document.addEventListener(`keydown`, closeCardByEsc);
+  closeButton.addEventListener(`click`, onClose);
+  document.addEventListener(`keydown`, onCloseByEsc);
 
   window.constants.MAP.insertBefore(card, window.constants.MAP.querySelector(`.map__filters-container`));
 };
 
-const closeCard = () => {
+const onClose = () => {
   const openedCard = window.constants.MAP.querySelector(`.map__card`);
   const activePin = window.constants.MAP.querySelector(`.map__pin--active`);
   if (openedCard) {
     const closeButton = openedCard.querySelector(`.popup__close`);
     openedCard.remove();
-    closeButton.removeEventListener(`click`, closeCard);
+    closeButton.removeEventListener(`click`, onClose);
   }
   if (activePin) {
     activePin.classList.remove(`map__pin--active`);
   }
 
-  document.removeEventListener(`keydown`, closeCardByEsc);
+  document.removeEventListener(`keydown`, onCloseByEsc);
 };
 
-const closeCardByEsc = (evt) => {
+const onCloseByEsc = (evt) => {
   if (evt.key === window.constants.ESC_KEY) {
     evt.preventDefault();
-    closeCard(evt);
+    onClose(evt);
   }
 };
 
 window.card = {
-  renderCard,
-  openCard,
-  closeCard,
-  closeCardByEsc
+  render,
+  openElement,
+  onClose,
+  onCloseByEsc
 };

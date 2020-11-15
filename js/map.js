@@ -1,9 +1,8 @@
 'use strict';
 
-
 const clearMap = () => {
   const pinsOnMap = window.pin.MAP_PINS.querySelectorAll(`.map__pin:not(.map__pin--main)`);
-  pinsOnMap.forEach(function (pin) {
+  pinsOnMap.forEach((pin) => {
     pin.remove();
   });
 };
@@ -18,7 +17,7 @@ const fillElement = (items) => {
   for (let i = 0; i < offersCount; i++) {
     let isOfferInItem = items[i].offer;
     if (isOfferInItem) { // требование ТЗ 5.3
-      fragment.appendChild(window.pin.renderPin(items[i], i));
+      fragment.appendChild(window.pin.render(items[i], i));
     }
   }
 

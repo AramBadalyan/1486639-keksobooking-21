@@ -1,6 +1,5 @@
 'use strict';
 
-
 const avatarPreview = document.querySelector(`.ad-form-header__preview img`);
 const photoPreview = document.querySelector(`.ad-form__photo`);
 
@@ -25,54 +24,57 @@ const resetImagesPreview = () => {
   photoPreview.innerHTML = ``;
 };
 
+// Выключение/выключение элементов формы
+const disableElement = (element) => {
+  element.disabled = true;
+};
+
+const enableElement = (element) => {
+  element.disabled = false;
+};
+
 // Перевод страницы в неактивное состояние
-const disactivatePage = () => {
+const disactivate = () => {
   window.constants.MAP.classList.add(`map--faded`);
-  window.form.adForm.classList.add(`ad-form--disabled`);
-  for (let element of window.form.adFormElements) {
-    element.disabled = true;
-  }
-  for (let element of window.form.filterFormElements) {
-    element.disabled = true;
-  }
+  window.form.advert.classList.add(`ad-form--disabled`);
+
+  Array.from(window.form.advertElements).forEach(disableElement);
+  Array.from(window.form.filterElements).forEach(disableElement);
+
   window.constants.mainPin.style.left = `${window.constants.mainPinStartPosition.x}px`;
   window.constants.mainPin.style.top = `${window.constants.mainPinStartPosition.y}px`;
-  window.card.closeCard();
+  window.card.onClose();
   window.pin.setCoordinates(false);
-  window.pin.removePins();
+  window.pin.removeAll();
   resetImagesPreview();
 
-  window.constants.mainPin.addEventListener(`mousedown`, activatePage);
+  window.constants.mainPin.addEventListener(`mousedown`, activate);
 };
 
 // Активация страницы
 const activateMap = (pins) => {
-  for (let element of window.form.filterFormElements) {
-    element.disabled = false;
-  }
+  Array.from(window.form.filterElements).forEach(enableElement);
   window.map.fillElement(pins);
 };
 
-const activateAdForm = () => {
-  window.form.adForm.classList.remove(`ad-form--disabled`);
+const activateadvert = () => {
+  window.form.advert.classList.remove(`ad-form--disabled`);
   window.pin.setCoordinates(true);
 
-  for (let element of window.form.adFormElements) {
-    element.disabled = false;
-  }
+  Array.from(window.form.advertElements).forEach(enableElement);
 };
 
-const activatePage = (evt) => {
+const activate = (evt) => {
   if (evt.button === window.constants.MOUSE_MAIN_BUTTON) {
     window.server.load(activateMap, errorHandler); // требование ТЗ 5.10
-    activateAdForm();
+    activateadvert();
 
     window.constants.MAP.classList.remove(`map--faded`);
-    window.constants.mainPin.removeEventListener(`mousedown`, activatePage);
+    window.constants.mainPin.removeEventListener(`mousedown`, activate);
   }
 };
 
 window.page = {
-  activatePage,
-  disactivatePage
+  activate,
+  disactivate
 };

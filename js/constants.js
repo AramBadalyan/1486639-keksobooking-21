@@ -1,6 +1,5 @@
 'use strict';
 
-
 const MAP = document.querySelector(`.map`);
 
 const MAX_PINS_ON_MAP = 5;
