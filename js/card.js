@@ -41,8 +41,8 @@ const render = (offerObj) => {
   offerObj.offer.photos.forEach((photo) => {
     let newPhoto = document.createElement(`img`);
     newPhoto.classList.add(`popup__photo`);
-    newPhoto.width = 45;
-    newPhoto.height = 40;
+    newPhoto.width = window.constants.CARD_PREVIEW_WIDTH;
+    newPhoto.height = window.constants.CARD_PREVIEW_HEIGTH;
     newPhoto.alt = `Фотография жилья`;
     newPhoto.src = photo;
 

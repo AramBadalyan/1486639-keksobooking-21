@@ -22,7 +22,7 @@ const priceOfType = {
 };
 
 // Валидация поля Количество мест
-const typeOfCapacity = (target) => {
+const checkTypeOfCapacity = (target) => {
   const value = target.value;
   const isValid = guestCapacity[window.formValidation.typeOfRoom].some((element) => {
     return element === value;
@@ -39,7 +39,7 @@ const typeOfCapacity = (target) => {
 };
 
 // Валидация Типа жилья и Цены за ночь
-const price = (target) => {
+const checkPrice = (target) => {
   const value = target.value;
   if (target.validity.valueMissing) {
     target.setCustomValidity(`Обязательное поле`);
@@ -54,7 +54,7 @@ const price = (target) => {
 };
 
 // Валидация длины введенного значения
-const valueLength = (target, minValue, maxValue) => {
+const checkValueLength = (target, minValue, maxValue) => {
   let length = target.value.length;
   if (length < minValue) {
     target.setCustomValidity(`Ещё хотя бы ${minValue - length} знака(ов)`);
@@ -76,7 +76,7 @@ window.formValidation = {
   typeOfRoom: `1`,
   typeOfHouse: `flat`,
 
-  typeOfCapacity,
-  price,
-  valueLength
+  checkTypeOfCapacity,
+  checkPrice,
+  checkValueLength
 };
