@@ -2,6 +2,7 @@
 
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
+const MAX_OFFER_PRICE = 1000000;
 
 const filter = window.constants.MAP.querySelector(`.map__filters`);
 const filterElements = filter.children;
@@ -109,23 +110,38 @@ const setImageToPreview = (input, preview) => {
   }
 };
 
+// Сброс плейсхолдера и мин значения цены
+const resetPriceInput = () => {
+  priceInput.placeholder = window.formValidation.priceOfType[typeInput.value];
+  priceInput.min = window.formValidation.priceOfType[typeInput.value];
+};
+
+// Сброс формы объявления
+const resetAdvert = () => {
+  advert.reset();
+  resetPriceInput();
+  advertInputs.forEach((advertElement) => {
+    advertElement.style = window.formValidation.nonNotice;
+  });
+};
+
 advert.action = `https://21.javascript.pages.academy/keksobooking`;
 addressInput.readOnly = true;
 window.pin.setCoordinates(false);
 
 roomsInput.addEventListener(`change`, (evt) => {
   window.formValidation.typeOfRoom = evt.target.value;
-  window.formValidation.typeOfCapacity(capacityInput);
+  window.formValidation.checkTypeOfCapacity(capacityInput);
 });
 
 capacityInput.addEventListener(`change`, (evt) => {
-  window.formValidation.typeOfCapacity(evt.target);
+  window.formValidation.checkTypeOfCapacity(evt.target);
 });
 
-advertReset.addEventListener(`click`, () => {
-  advert.reset();
+advertReset.addEventListener(`click`, (evt) => {
+  resetAdvert();
   filter.reset();
-  window.page.disactivate();
+  window.page.disactivate(evt);
 });
 
 titleInput.required = true;
@@ -133,22 +149,22 @@ titleInput.minLength = MIN_TITLE_LENGTH;
 titleInput.maxLength = MAX_TITLE_LENGTH;
 
 titleInput.addEventListener(`input`, (evt) => {
-  window.formValidation.valueLength(evt.target, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH);
+  window.formValidation.checkValueLength(evt.target, MIN_TITLE_LENGTH, MAX_TITLE_LENGTH);
 });
 
 priceInput.required = true;
-priceInput.max = 1000000;
+priceInput.max = MAX_OFFER_PRICE;
 priceInput.placeholder = window.formValidation.priceOfType[window.formValidation.typeOfHouse];
 
 priceInput.addEventListener(`input`, (evt) => {
-  window.formValidation.price(evt.target);
+  window.formValidation.checkPrice(evt.target);
 });
 
 typeInput.addEventListener(`change`, () => {
   window.formValidation.typeOfHouse = typeInput.value;
   priceInput.placeholder = window.formValidation.priceOfType[window.formValidation.typeOfHouse];
   priceInput.min = window.formValidation.priceOfType[window.formValidation.typeOfHouse];
-  window.formValidation.price(priceInput);
+  window.formValidation.checkPrice(priceInput);
 });
 
 avatarInput.accept = `image/*`;
@@ -180,11 +196,7 @@ checkOutInput.addEventListener(`change`, (evt) => {
 
 advertSubmit.addEventListener(`click`, () => {
   advertInputs.forEach((advertElement) => {
-    if (!advertElement.validity.valid) {
-      advertElement.style = window.formValidation.errorNotice;
-    } else {
-      advertElement.style = window.formValidation.nonNotice;
-    }
+    advertElement.style = (!advertElement.validity.valid) ? window.formValidation.errorNotice : window.formValidation.nonNotice;
   });
 });
 

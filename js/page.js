@@ -34,7 +34,10 @@ const enableElement = (element) => {
 };
 
 // Перевод страницы в неактивное состояние
-const disactivate = () => {
+const disactivate = (evt) => {
+  if (evt) {
+    evt.preventDefault();
+  }
   window.constants.MAP.classList.add(`map--faded`);
   window.form.advert.classList.add(`ad-form--disabled`);
 
@@ -48,7 +51,7 @@ const disactivate = () => {
   window.pin.removeAll();
   resetImagesPreview();
 
-  window.constants.mainPin.addEventListener(`mousedown`, activate);
+  window.constants.mainPin.addEventListener(`mousedown`, onMainPinMousedown);
 };
 
 // Активация страницы
@@ -64,17 +67,17 @@ const activateadvert = () => {
   Array.from(window.form.advertElements).forEach(enableElement);
 };
 
-const activate = (evt) => {
+const onMainPinMousedown = (evt) => {
   if (evt.button === window.constants.MOUSE_MAIN_BUTTON) {
     window.server.load(activateMap, errorHandler); // требование ТЗ 5.10
     activateadvert();
 
     window.constants.MAP.classList.remove(`map--faded`);
-    window.constants.mainPin.removeEventListener(`mousedown`, activate);
+    window.constants.mainPin.removeEventListener(`mousedown`, onMainPinMousedown);
   }
 };
 
 window.page = {
-  activate,
+  onMainPinMousedown,
   disactivate
 };

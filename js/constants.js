@@ -5,6 +5,8 @@ const MAP = document.querySelector(`.map`);
 const MAX_PINS_ON_MAP = 5;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
+const CARD_PREVIEW_WIDTH = 45;
+const CARD_PREVIEW_HEIGTH = 40;
 const POINTER_HEIGHT = 16; // 16px - высота кончика указателя
 const OFFSET_X = PIN_WIDTH / 2;
 const OFFSET_Y = PIN_HEIGHT;
@@ -33,6 +35,8 @@ const mainPinStartPosition = {
 
 window.constants = {
   MAX_PINS_ON_MAP,
+  CARD_PREVIEW_WIDTH,
+  CARD_PREVIEW_HEIGTH,
   POINTER_HEIGHT,
   OFFSET_X,
   OFFSET_Y,
